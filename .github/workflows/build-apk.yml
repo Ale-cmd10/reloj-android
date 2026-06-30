@@ -48,6 +48,11 @@ jobs:
 
       - name: Compilar el APK (debug)
         run: |
+          # El Android Gradle Plugin exige Java 17 (el runner usa Java 11 por
+          # defecto). Apuntamos JAVA_HOME al JDK 17 ya instalado en el runner.
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+          echo "Usando JAVA_HOME=$JAVA_HOME"
+          java -version
           export GRADLE_OPTS="-Xmx4g"
           yes | buildozer android debug
 
