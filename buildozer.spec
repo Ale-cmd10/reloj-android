@@ -21,6 +21,11 @@ version = 1.0
 #  - android: API de la plataforma
 requirements = python3,kivy==2.3.0,tzdata,plyer,android
 
+# Versión de python-for-android a usar (Buildozer la clona desde git).
+# Se fija v2024.01.21 porque compila Python 3.11; las versiones más nuevas
+# compilan Python 3.13, incompatible con los .c de Kivy 2.3.0.
+p4a.branch = v2024.01.21
+
 # Orientación
 orientation = portrait
 fullscreen = 0
