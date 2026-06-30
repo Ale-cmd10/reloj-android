@@ -35,6 +35,7 @@ from kivy.uix.switch import Switch
 from kivy.uix.popup import Popup
 from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
+from kivy.utils import platform
 
 # --- Vibración / sonido en Android (con respaldo en PC) --------------------
 try:
@@ -107,11 +108,12 @@ CIUDADES = {
     "Auckland": ("Pacific/Auckland", 13),
 }
 
-# --- Paleta (rgba 0..1) ----------------------------------------------------
-GRAD = [(0.05, 0.07, 0.21), (0.125, 0.094, 0.36), (0.27, 0.12, 0.47),
-        (0.43, 0.15, 0.43), (0.55, 0.20, 0.37)]
+# --- Paleta (rgba 0..1) — oscura y poco saturada ---------------------------
+GRAD = [(0.035, 0.039, 0.055), (0.059, 0.067, 0.094),
+        (0.086, 0.098, 0.133), (0.063, 0.071, 0.102),
+        (0.039, 0.043, 0.063)]
 BLANCO = (1, 1, 1, 1)
-TENUE = (0.83, 0.84, 0.93, 1)
+TENUE = (0.60, 0.63, 0.71, 1)
 NARANJA = (1, 0.62, 0.04, 1)
 VERDE = (0.19, 0.82, 0.35, 1)
 ROJO = (1, 0.27, 0.23, 1)
@@ -190,10 +192,17 @@ class GButton(ButtonBehavior, Label):
         self._line.rounded_rectangle = (x, y, w, h, self._r)
 
 
+def auto_text(lbl):
+    """Hace que text_size siga al tamaño del widget (alineado y responsive)."""
+    lbl.bind(size=lambda w, *a: setattr(w, "text_size", w.size))
+    return lbl
+
+
 def titulo(texto):
-    return Label(text=texto, font_size="26sp", bold=True, color=BLANCO,
-                 halign="left", valign="middle", size_hint_y=None,
-                 height=dp(54), text_size=(Window.width - dp(40), None))
+    lbl = Label(text=texto, font_size="26sp", bold=True, color=BLANCO,
+                halign="left", valign="middle", size_hint_y=None,
+                height=dp(54))
+    return auto_text(lbl)
 
 
 # ===========================================================================
@@ -207,9 +216,9 @@ class PantallaMundial(Screen):
         root = BoxLayout(orientation="vertical", padding=[dp(16), dp(10)],
                          spacing=dp(8))
         cab = BoxLayout(size_hint_y=None, height=dp(48))
-        cab.add_widget(Label(text="Reloj mundial", font_size="24sp", bold=True,
-                             color=BLANCO, halign="left", valign="middle",
-                             text_size=(dp(220), None)))
+        cab.add_widget(auto_text(Label(text="Reloj mundial", font_size="24sp",
+                                       bold=True, color=BLANCO, halign="left",
+                                       valign="middle")))
         mas = GButton(text="+", radius=18, font_size="22sp", color=BLANCO,
                       size_hint=(None, None), size=(dp(44), dp(44)))
         mas.bind(on_release=lambda *_: self.popup_anadir())
@@ -233,18 +242,17 @@ class PantallaMundial(Screen):
         for ciudad in self.ciudades:
             card = Glass(orientation="horizontal", size_hint_y=None,
                          height=dp(74), padding=[dp(16), dp(8)])
-            izq = BoxLayout(orientation="vertical")
-            off = Label(text="", font_size="11sp", color=TENUE, halign="left",
-                        valign="bottom", text_size=(dp(180), None))
-            nom = Label(text=ciudad, font_size="20sp", color=BLANCO,
-                        halign="left", valign="top", text_size=(dp(180), None))
+            izq = BoxLayout(orientation="vertical", size_hint_x=0.62)
+            off = auto_text(Label(text="", font_size="11sp", color=TENUE,
+                                  halign="left", valign="bottom"))
+            nom = auto_text(Label(text=ciudad, font_size="20sp", color=BLANCO,
+                                  halign="left", valign="top"))
             izq.add_widget(off)
             izq.add_widget(nom)
             card.add_widget(izq)
-            hora = Label(text="--:--", font_size="34sp", color=BLANCO,
-                         halign="right", valign="middle", size_hint_x=None,
-                         width=dp(110))
-            hora.bind(size=lambda w, *_: setattr(w, "text_size", w.size))
+            hora = auto_text(Label(text="--:--", font_size="34sp", color=BLANCO,
+                                   halign="right", valign="middle",
+                                   size_hint_x=0.38))
             card.add_widget(hora)
             quitar = GButton(text="x", radius=14, font_size="16sp", color=ROJO,
                              size_hint=(None, 1), width=dp(34))
@@ -313,9 +321,9 @@ class PantallaAlarma(Screen):
         root = BoxLayout(orientation="vertical", padding=[dp(16), dp(10)],
                          spacing=dp(8))
         cab = BoxLayout(size_hint_y=None, height=dp(48))
-        cab.add_widget(Label(text="Alarma", font_size="24sp", bold=True,
-                             color=BLANCO, halign="left", valign="middle",
-                             text_size=(dp(220), None)))
+        cab.add_widget(auto_text(Label(text="Alarma", font_size="24sp",
+                                       bold=True, color=BLANCO, halign="left",
+                                       valign="middle")))
         mas = GButton(text="+", radius=18, font_size="22sp", color=BLANCO,
                       size_hint=(None, None), size=(dp(44), dp(44)))
         mas.bind(on_release=lambda *_: self.popup_nueva())
@@ -340,12 +348,12 @@ class PantallaAlarma(Screen):
                          height=dp(80), padding=[dp(16), dp(8)])
             izq = BoxLayout(orientation="vertical")
             col = BLANCO if al.activa else TENUE
-            izq.add_widget(Label(text=f"{al.h:02d}:{al.m:02d}",
-                                 font_size="36sp", color=col, halign="left",
-                                 valign="bottom", text_size=(dp(150), None)))
-            izq.add_widget(Label(text=al.etq, font_size="12sp", color=TENUE,
-                                 halign="left", valign="top",
-                                 text_size=(dp(150), None)))
+            izq.add_widget(auto_text(Label(text=f"{al.h:02d}:{al.m:02d}",
+                                           font_size="36sp", color=col,
+                                           halign="left", valign="bottom")))
+            izq.add_widget(auto_text(Label(text=al.etq, font_size="12sp",
+                                           color=TENUE, halign="left",
+                                           valign="top")))
             card.add_widget(izq)
             sw = Switch(active=al.activa, size_hint_x=None, width=dp(80))
             sw.bind(active=lambda w, v, a=al: self._toggle(a, v))
@@ -719,7 +727,10 @@ class RelojApp(App):
 
 
 if __name__ == "__main__":
-    Window.clearcolor = (0.05, 0.07, 0.21, 1)
-    if Window.size[0] > 600:          # solo en escritorio, para previsualizar
+    Window.clearcolor = (0.035, 0.039, 0.055, 1)
+    # SOLO en escritorio fijamos un tamaño para previsualizar. En Android/iOS
+    # NUNCA tocamos Window.size (si no, la app sale en miniatura en pantallas
+    # grandes como el Galaxy Fold).
+    if platform not in ("android", "ios"):
         Window.size = (400, 720)
     RelojApp().run()
