@@ -1,0 +1,11 @@
+# Buildozer / compilación
+.buildozer/
+bin/
+*.apk
+*.aab
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
