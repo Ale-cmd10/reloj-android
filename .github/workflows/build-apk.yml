@@ -32,7 +32,11 @@ jobs:
       - name: Instalar Buildozer y Cython
         run: |
           python -m pip install --upgrade pip
-          pip install buildozer==1.5.0 cython==0.29.36
+          # python-for-android fijado a una versión que usa Python 3.11:
+          # las versiones más nuevas compilan Python 3.12/3.13, incompatible
+          # con los .c precompilados de Kivy 2.3.0 (_PyGen_SetStopIterationValue).
+          pip install buildozer==1.5.0 cython==0.29.36 \
+            python-for-android==2024.1.21
 
       - name: Cachear el SDK/NDK de Android
         uses: actions/cache@v4
@@ -40,9 +44,9 @@ jobs:
           path: |
             ~/.buildozer
             ~/.gradle
-          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+          key: buildozer-v2-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
           restore-keys: |
-            buildozer-${{ runner.os }}-
+            buildozer-v2-${{ runner.os }}-
 
       - name: Compilar el APK (debug)
         run: |
